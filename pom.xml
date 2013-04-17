@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  
+  <packaging>jar</packaging>
+  <groupId>org.webjars</groupId>
+  <artifactId>cometd-jquery</artifactId>
+  <version>2.3.1</version>
+  <name>cometd-jquery</name>
+  <description>WebJar for cometd-jquery</description>
+  <url>http://webjars.org</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://github.com/webjars/cometd-jquery</url>
+    <connection>scm:git:https://github.com/webjars/cometd-jquery.git</connection>
+    <developerConnection>scm:git:https://github.com/webjars/cometd-jquery.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <upstream.version>${project.version}</upstream.version>
+    <upstream.url>http://download.cometd.org</upstream.url>
+    <destDir>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${upstream.version}</destDir>
+    <jquery.version>1.8.3</jquery.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>cometd</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <version>${jquery.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <version>1.0-beta-4</version>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>download-single</goal>
+            </goals>
+            <configuration>
+              <url>${upstream.url}</url>
+              <fromFile>cometd-${upstream.version}-distribution.tar.gz</fromFile>
+              <toFile>${project.build.directory}/${project.artifactId}.tar.gz</toFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals><goal>run</goal></goals>
+            <configuration>
+              <target>
+                <echo message="unzip archive..." />
+                <gunzip src="${project.build.directory}/${project.artifactId}.tar.gz" dest="${project.build.directory}" />
+                <untar src="${project.build.directory}/${project.artifactId}.tar" dest="${project.build.directory}"/>
+                <!-- <unjar src="${project.build.directory}/${project.artifactId}-${project.version}.jar" dest="${project.build.directory}"/> -->
+                <echo message="make tmp dirs..." />
+                <mkdir dir="${destDir}"/>
+                <mkdir dir="${project.build.directory}/cometd-javascript/jquery"/>
+
+                <echo message="processing cometd-javascript-jquery-${project.version}..." />
+                <unjar src="${project.build.directory}/cometd-${upstream.version}/cometd-javascript/jquery/target/cometd-javascript-jquery-${project.version}.war" 
+                       dest="${project.build.directory}/cometd-javascript/jquery"/>
+                <move todir="${destDir}">
+                  <fileset dir="${project.build.directory}/cometd-javascript/jquery/jquery">
+                    <include name="**/*.js"/>
+                    <exclude name="**/jquery-${jquery.version}.js"/>
+                  </fileset>
+                </move>
+                
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3.2</version>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
