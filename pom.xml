@@ -40,7 +40,8 @@
     <upstream.version>3.0.2</upstream.version>
     <upstream.url>http://download.cometd.org</upstream.url>
     <destDir>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${upstream.version}</destDir>
-    <jquery.version>1.8.3</jquery.version>
+    <!-- sync with upstream bundled version -->
+    <jquery.version>2.2.1</jquery.version>
   </properties>
 
   <dependencies>
